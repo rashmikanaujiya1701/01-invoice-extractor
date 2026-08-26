@@ -1,6 +1,4 @@
-# Also requires the Tesseract OCR system binary:
-#   Ubuntu/Debian: sudo apt install tesseract-ocr
-#   macOS:         brew install tesseract
+# Also requires the Tesseract OCR system binary (see packages.txt for Streamlit Cloud)
 pandas
 pytesseract
 Pillow
