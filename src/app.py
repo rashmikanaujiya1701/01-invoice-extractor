@@ -3,16 +3,20 @@ import os
 import sys
 import tempfile
 
-# ensure src/ is on path so extract_invoices can be imported when run via
-# `streamlit run src/app.py` from the project root
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# ensure src/ is on path regardless of where streamlit run is invoked from
+_src = os.path.dirname(os.path.abspath(__file__))
+if _src not in sys.path:
+    sys.path.insert(0, _src)
 
 import pandas as pd
-import pytesseract
 import streamlit as st
 from PIL import Image
 
-from extract_invoices import extract_fields, ocr_image
+try:
+    from extract_invoices import extract_fields, ocr_image
+except ModuleNotFoundError:
+    sys.path.insert(0, os.path.join(_src, "..", "src"))
+    from extract_invoices import extract_fields, ocr_image
 
 
 def main():
