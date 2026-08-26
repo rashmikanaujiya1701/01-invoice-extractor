@@ -3,18 +3,16 @@ import os
 import sys
 import tempfile
 
+# ensure src/ is on path so extract_invoices can be imported when run via
+# `streamlit run src/app.py` from the project root
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-import cv2
-import numpy as np
 import pandas as pd
 import pytesseract
 import streamlit as st
 from PIL import Image
 
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-
-from extract_invoices import ocr_image, extract_fields
+from extract_invoices import extract_fields, ocr_image
 
 
 def main():
@@ -88,7 +86,8 @@ def main():
     with pd.ExcelWriter(buf, engine="openpyxl") as writer:
         df.to_excel(writer, sheet_name="Extracted Invoices", index=False)
         pd.DataFrame({
-            "metric": ["Invoices processed", "Flagged for review", "Avg confidence %", "Total GST amount", "Total invoice value"],
+            "metric": ["Invoices processed", "Flagged for review", "Avg confidence %",
+                       "Total GST amount", "Total invoice value"],
             "value": [
                 len(df),
                 int(df["needs_review"].sum()),
@@ -106,5 +105,4 @@ def main():
     )
 
 
-if __name__ == "__main__":
-    main()
+main()
