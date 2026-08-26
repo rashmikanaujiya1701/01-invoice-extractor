@@ -12,10 +12,9 @@ import os
 import re
 import shutil
 
-import cv2
 import pandas as pd
 import pytesseract
-from PIL import Image
+from PIL import Image, ImageOps
 
 pytesseract.pytesseract.tesseract_cmd = (
     shutil.which("tesseract") or r"C:\Program Files\Tesseract-OCR\tesseract.exe"
@@ -26,12 +25,12 @@ OUTPUT_XLSX = os.path.join(os.path.dirname(__file__), "..", "output", "extracted
 
 
 def preprocess(path: str) -> Image.Image:
-    """Grayscale; apply Otsu threshold only for low-contrast (scanned) images."""
-    img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
-    if img.mean() > 200:          # already clean/white-background — skip threshold
-        return Image.fromarray(img)
-    _, img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    return Image.fromarray(img)
+    """Convert to grayscale only; threshold for low-contrast scanned images."""
+    img = ImageOps.grayscale(Image.open(path))
+    avg = sum(img.getdata()) / (img.width * img.height)
+    if avg <= 200:
+        img = img.point(lambda p: 255 if p > 128 else 0)
+    return img
 
 
 def ocr_image(path: str) -> str:
